@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: php
+        tier: backend
+    spec:
+      volumes:
+      - name: dir
+        hostPath:
+          path: /test
+      containers:
+      - name: php
+        image: docker.io/nazimgaoua/badi:dev
+        volumeMounts:
+        - name: dir
+          mountPath: /test
+        env:
+          - name: APP_NAME
+            value: "Laravel"
+          - name: APP_KEY
+            value: "base64:sE2yEDDw/IacZi0SVfzayGD0N0/agcFTieam5fhxLK4="
+          - name: APP_ENV
+            value: "local"
+          - name: APP_URL
+            value: "http://localhost"
+          - name: DB_CONNECTION
+            value: "mysql"
+          - name: DB_HOST
+            value: "mysql"
+          - name: DB_DATABASE
+            value: "sdproject"
+          - name: DB_PORT
+            value: "3306"
+          - name: DB_USERNAME
+            value: "root"
+          - name: DB_PASSWORD
+            value: "root"
+          - name: QUEUE_CONNECTION
+            value: "sync"
+
+      initContainers:
+      - name: install
+        image: busybox
+        volumeMounts:
+        - name: dir
+          mountPath: /test
+        command:
+        - cp
+        - "-r"
+        - "/var/www/."
+        - "/test/app"
+
+
